@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>欢迎来到 vibe coding</title>
+		<meta name="description" content="欢迎来到 vibe coding — PPT 封面效果" />
+		<style>
+			/* Reset */
+			* { box-sizing: border-box; margin: 0; padding: 0; }
+			html,body{height:100%;}
+			body{
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+				background: radial-gradient(1200px 600px at 10% 10%, rgba(58,77,233,0.18), transparent),
+										radial-gradient(900px 500px at 90% 90%, rgba(253,94,83,0.12), transparent),
+										linear-gradient(135deg, #071024 0%, #0f1726 100%);
+				color: #fff;
+				-webkit-font-smoothing:antialiased;
+				-moz-osx-font-smoothing:grayscale;
+				display:flex;
+				align-items:center;
+				justify-content:center;
+				padding:32px;
+			}
+
+			/* Container mimics a PPT slide */
+			.slide {
+				width: min(1200px, 92vw);
+				height: min(700px, 70vh);
+				background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+				border-radius: 18px;
+				box-shadow: 0 20px 50px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+				position:relative;
+				overflow:hidden;
+				display:grid;
+				grid-template-columns: 1fr 420px;
+				gap: 32px;
+				padding: 48px;
+			}
+
+			/* Left: big title */
+			.hero {
+				display:flex;
+				flex-direction:column;
+				justify-content:center;
+				gap:18px;
+			}
+
+			.logo {
+				display:inline-grid;
+				grid-auto-flow:column;
+				gap:12px;
+				align-items:center;
+			}
+
+			.logo .mark{
+				width:64px;height:64px;border-radius:12px;
+				background: linear-gradient(135deg,#7b61ff,#00d4ff);
+				display:flex;align-items:center;justify-content:center;
+				box-shadow: 0 8px 24px rgba(47,84,235,0.24);
+				font-weight:700;font-size:20px;color:white;
+			}
+
+			.title {
+				font-size:64px;
+				line-height:1.02;
+				font-weight:800;
+				letter-spacing: -1px;
+				background: linear-gradient(90deg,#ffffff, #cfe8ff 60%);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+				text-shadow: 0 6px 30px rgba(3,12,40,0.6);
+			}
+
+			.subtitle {
+				font-size:20px;color:rgba(255,255,255,0.78);
+				max-width:48ch;
+			}
+
+			/* Right: info card */
+			.card {
+				background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+				border-radius:12px;
+				padding:28px;
+				display:flex;flex-direction:column;gap:18px;
+				align-self:center;
+				min-width:320px;
+				border: 1px solid rgba(255,255,255,0.03);
+			}
+
+			.card h3{font-size:18px;margin-bottom:6px;color:#e6f0ff}
+			.meta{color:rgba(255,255,255,0.6);font-size:14px}
+
+			/* Decorative animated shapes */
+			.blob{
+				position:absolute;filter:blur(40px);opacity:0.12;transform-origin:center;
+				animation: float 8s ease-in-out infinite;
+			}
+			.blob.b1{width:520px;height:520px;right:-120px;bottom:-120px;background:radial-gradient(circle at 30% 30%, #6f5cff, #00d4ff)}
+			.blob.b2{width:380px;height:380px;left:-140px;top:-100px;background:radial-gradient(circle at 70% 70%, #ff6b6b, #ffb86b);animation-duration:10s}
+
+			@keyframes float{
+				0%,100%{transform: translateY(0) rotate(0)}
+				50%{transform: translateY(-18px) rotate(6deg)}
+			}
+
+			/* small footer hint */
+			.hint{position:absolute;left:24px;bottom:18px;color:rgba(255,255,255,0.45);font-size:13px}
+
+			/* Responsive */
+			@media (max-width:980px){
+				.slide{grid-template-columns: 1fr; height: min(76vh,920px); padding:28px}
+				.card{order:2;width:100%;min-width:0}
+				.title{font-size:44px}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="slide" role="main" aria-label="欢迎来到 vibe coding PPT 封面">
+			<div class="blob b1" aria-hidden="true"></div>
+			<div class="blob b2" aria-hidden="true"></div>
+
+			<section class="hero">
+				<div class="logo">
+					<div class="mark">v</div>
+					<div style="color:rgba(255,255,255,0.85);font-weight:600;">vibe coding</div>
+				</div>
+
+				<h1 class="title">欢迎来到<br/>vibe coding</h1>
+
+				<p class="subtitle">一个简洁的 PPT 风格封面。适合截图与展示：大标题、渐变光斑与柔和阴影，营造专业与现代的视觉氛围。</p>
+			</section>
+
+			<aside class="card" aria-label="信息卡片">
+				<h3>演示信息</h3>
+				<div class="meta">作者：vibe team</div>
+				<div class="meta">场景：产品演示 / 课程 / 主题封面</div>
+
+				<div style="margin-top:6px;flex:1">
+					<p style="color:rgba(255,255,255,0.75);font-size:15px;line-height:1.5">提示：在 macOS 上截屏建议使用 Cmd + Shift + 4，然后选择区域。可在不同窗口尺寸下微调以获取最佳构图。</p>
+				</div>
+
+				<div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+					<button onclick="downloadPNG()" style="flex:1;padding:10px 14px;border-radius:8px;border:none;background:linear-gradient(90deg,#7b61ff,#00d4ff);color:white;font-weight:700;cursor:pointer;">下载 PNG</button>
+					<button onclick="location.reload()" style="padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:white;cursor:pointer;">重置</button>
+				</div>
+			</aside>
+
+			<div class="hint">封面 | vibe coding • PPT 风格</div>
+		</main>
+
+		<script>
+			// Simple client-side PNG export using html2canvas (tiny inline implementation)
+			// We'll use a lightweight approach: draw the slide onto a canvas via foreignObject.
+			function downloadPNG(){
+				const slide = document.querySelector('.slide');
+				const width = Math.min(1200, Math.max(800, slide.clientWidth));
+				const height = Math.min(800, Math.max(520, slide.clientHeight));
+
+				const svg = `<?xml version="1.0" encoding="utf-8"?>\n`+
+					`<svg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'>`+
+					`<foreignObject width='100%' height='100%'>`+
+					`${new XMLSerializer().serializeToString(slide.cloneNode(true))}`+
+					`</foreignObject></svg>`;
+
+				const blob = new Blob([svg],{type:'image/svg+xml;charset=utf-8'});
+				const url = URL.createObjectURL(blob);
+				const img = new Image();
+				img.onload = () => {
+					const canvas = document.createElement('canvas');
+					canvas.width = width * devicePixelRatio;
+					canvas.height = height * devicePixelRatio;
+					const ctx = canvas.getContext('2d');
+					ctx.scale(devicePixelRatio, devicePixelRatio);
+					ctx.fillStyle = getComputedStyle(document.body).background || '#071024';
+					ctx.fillRect(0,0,width,height);
+					ctx.drawImage(img, 0, 0, width, height);
+					canvas.toBlob(b => {
+						const a = document.createElement('a');
+						a.href = URL.createObjectURL(b);
+						a.download = 'vibe-coding-cover.png';
+						a.click();
+						URL.revokeObjectURL(a.href);
+					}, 'image/png');
+					URL.revokeObjectURL(url);
+				};
+				img.onerror = ()=>{ alert('导出失败，请使用系统截屏或在较新浏览器中重试。'); URL.revokeObjectURL(url); };
+				img.src = url;
+			}
+		</script>
+	</body>
+</html>
