@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>小红书 - 首页（桌面演示）</title>
+    <meta name="description" content="桌面端小红书风格首页瀑布流示例" />
+    <style>
+      :root{
+        --bg:#fafafa;--card:#fff;--muted:#888;--accent:#ff3b30;
+      }
+      *{box-sizing:border-box}
+      body{font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial; margin:0; background:var(--bg); color:#111}
+
+      /* header */
+      .topbar{height:68px;background:#fff;border-bottom:1px solid #e9e9e9;display:flex;align-items:center;padding:0 28px;gap:20px}
+      .logo{font-weight:800;color:var(--accent);font-size:20px;letter-spacing:1px}
+      .search{flex:1;display:flex;align-items:center}
+      .search input{width:60%;height:38px;border-radius:19px;border:1px solid #eee;padding:0 14px;font-size:14px;background:#f6f6f6}
+      .actions{display:flex;gap:12px;align-items:center}
+      .btn{padding:8px 12px;border-radius:6px;border:none;background:#fff;cursor:pointer}
+
+      /* layout */
+      .container{max-width:1200px;margin:22px auto;display:flex;gap:24px;padding:0 18px}
+      .main{flex:1}
+      .aside{width:320px}
+
+      /* masonry / 瀑布流 - 使用 CSS columns 技术 */
+      .masonry{
+        column-count:3;
+        column-gap:18px;
+      }
+      .card{
+        display:inline-block; /* required for column layout */
+        width:100%;
+        margin:0 0 18px;
+        background:var(--card);
+        border-radius:10px;
+        box-shadow:0 2px 8px rgba(0,0,0,0.06);
+        overflow:hidden;
+        break-inside:avoid;
+      }
+      .card img{width:100%;display:block;object-fit:cover}
+      .card .body{padding:12px}
+      .meta{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+      .meta img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+      .title{font-weight:700;font-size:15px;margin:8px 0}
+      .desc{color:#444;font-size:14px;line-height:1.4}
+
+      /* aside */
+      .panel{background:#fff;border-radius:10px;padding:14px;border:1px solid #f0f0f0;margin-bottom:18px}
+      .panel h4{margin:0 0 10px;font-size:15px}
+      .user{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+      .user .info{font-size:14px}
+
+      /* hover effect */
+      .card:hover{transform:translateY(-4px);transition:transform .18s}
+
+      /* responsive: only desktop layout (above 1000px). Below that stack for preview */
+      @media (max-width:1000px){
+        .container{flex-direction:column;padding:0 12px}
+        .aside{width:100%}
+        .masonry{column-count:2}
+      }
+      @media (max-width:700px){
+        .masonry{column-count:1}
+        .search input{width:100%}
+      }
+      /* modal / detail */
+      .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1200}
+      .modal.open{display:flex}
+      .modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45)}
+      .modal-dialog{position:relative;background:#fff;border-radius:12px;max-width:880px;width:92%;max-height:90vh;overflow:auto;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;flex-direction:column}
+      .modal-close{position:absolute;right:12px;top:8px;border:none;background:transparent;font-size:26px;cursor:pointer}
+      .modal-body{display:flex;flex-direction:row;gap:16px;padding:16px}
+      .modal-body img{width:48%;height:auto;border-radius:8px;object-fit:cover}
+      .modal-info{flex:1}
+      .modal-info h3{margin:6px 0}
+      .modal-info .meta{margin-bottom:10px}
+      .comments{border-top:1px solid #f0f0f0;padding:12px}
+      .comments h4{margin:0 0 8px}
+      #commentList{list-style:none;padding:0;margin:0 0 10px;max-height:200px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+      .comment{background:#f7f7f7;padding:8px;border-radius:8px}
+      .comment .meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+      .comment-form{display:flex;gap:8px}
+      .comment-form input{flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6}
+      .comment-form button{padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="logo">小红书</div>
+      <div class="search">
+        <input placeholder="搜索笔记、用户、标签" aria-label="搜索" />
+      </div>
+      <div class="actions">
+        <button class="btn">消息</button>
+        <button class="btn">发布</button>
+        <div style="width:42px;height:42px;border-radius:50%;background:#ddd"></div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="main">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">为你精选</h2>
+          <div style="color:var(--muted);font-size:13px">瀑布流 · 桌面预览</div>
+        </div>
+
+  <div id="masonry" class="masonry" aria-live="polite"></div>
+
+        <div id="loading" style="text-align:center;color:var(--muted);padding:18px">滚动加载更多...</div>
+      </section>
+
+      <aside class="aside">
+        <div class="panel">
+          <h4>热门作者</h4>
+          <div class="user"><img src="https://picsum.photos/seed/u1/80/80" alt=""/><div class="info"><div style="font-weight:700">美食记</div><div style="color:var(--muted);font-size:13px">12.3w粉丝</div></div></div>
+          <div class="user"><img src="https://picsum.photos/seed/u2/80/80" alt=""/><div class="info"><div style="font-weight:700">旅行笔记</div><div style="color:var(--muted);font-size:13px">9.1w粉丝</div></div></div>
+        </div>
+
+        <div class="panel">
+          <h4>热门话题</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn">#旅行日记</button>
+            <button class="btn">#家居改造</button>
+            <button class="btn">#好物推荐</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>关于示例页</h4>
+          <p style="color:var(--muted);font-size:13px;line-height:1.45;margin:0">这是一个桌面端的瀑布流示例页面，图片来自 picsum.photos 用于占位。可用于截图或前端展示。</p>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Modal: post detail + comments -->
+    <div id="modal" class="modal" aria-hidden="true" role="dialog">
+      <div class="modal-overlay" id="modalOverlay"></div>
+      <div class="modal-dialog" role="document">
+        <button class="modal-close" id="modalClose" aria-label="关闭">×</button>
+        <div class="modal-body">
+          <img id="modalImg" src="" alt="" />
+          <div class="modal-info">
+            <h3 id="modalTitle"></h3>
+            <div class="meta" style="display:flex;align-items:center;gap:10px"><img id="modalAvatar" src="" style="width:44px;height:44px;border-radius:50%" alt=""/><div><strong id="modalUser"></strong><div id="modalTime" style="color:var(--muted);font-size:13px"></div></div></div>
+            <p id="modalDesc" style="margin-top:10px;color:#333"></p>
+
+            <section class="comments">
+              <h4>评论</h4>
+              <ul id="commentList"></ul>
+              <div class="comment-form">
+                <input id="commentInput" placeholder="写评论...（按回车发送）" aria-label="写评论" />
+                <button id="commentBtn">发送</button>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Demo data generator: create posts with random heights
+      const posts = Array.from({length:24}).map((_,i)=>({
+        id:i+1,
+        user:`用户${i%8+1}`,
+        avatar:`https://picsum.photos/seed/av${i%8+1}/120/120`,
+        img:`https://picsum.photos/seed/p${i+1}/600/${300 + ((i*73)%400)}`,
+        title:["断舍离好物","超美民宿推荐","一周穿搭分享","隐藏咖啡馆笔记","厨房清洁妙招"][i%5],
+        desc:["简短的文字描述，表达笔记的核心观点和使用感受。","拍摄于周末，光线非常棒，推荐给大家。","价格友好，值得入手。","体验感非常好，服务热情。","小技巧分享：每次只需要三步。"][(i+2)%5]
+      }))
+
+      const masonry = document.getElementById('masonry')
+      let index = 0
+      function renderBatch(n=9){
+        const frag = document.createDocumentFragment()
+        for(let k=0;k<n && index<posts.length;k++,index++){
+          const p = posts[index]
+          const card = document.createElement('article')
+          card.className='card'
+          card.setAttribute('data-id', p.id)
+          card.tabIndex = 0
+          card.innerHTML = `\n            <img loading="lazy" src="${p.img}" alt="${p.title}" />\n            <div class="body">\n              <div class="meta"><img src="${p.avatar}" alt=""/><div style=\"display:flex;flex-direction:column\"><strong>${p.user}</strong><span style=\"color:var(--muted);font-size:12px\">${Math.floor(Math.random()*50)+1}小时前</span></div></div>\n              <div class="title">${p.title}</div>\n              <div class="desc">${p.desc}</div>\n            </div>`
+          // click / keyboard to open modal
+          card.addEventListener('click',()=> openModal(p.id))
+          card.addEventListener('keydown',(e)=>{ if(e.key==="Enter") openModal(p.id) })
+          frag.appendChild(card)
+        }
+        masonry.appendChild(frag)
+        if(index>=posts.length){document.getElementById('loading').innerText='没有更多了'}
+      }
+
+      // initial render
+      renderBatch(12)
+
+      // simple infinite scroll demo
+      let loadingMore=false
+      window.addEventListener('scroll',()=>{
+        if(loadingMore) return
+        const nearBottom = window.innerHeight + window.scrollY > document.body.offsetHeight - 200
+        if(nearBottom && index < posts.length){
+          loadingMore = true
+          document.getElementById('loading').innerText='加载中...'
+          setTimeout(()=>{ renderBatch(6); loadingMore=false },700)
+        }
+      })
+
+      // modal + comments logic
+      const modal = document.getElementById('modal')
+      const modalImg = document.getElementById('modalImg')
+      const modalTitle = document.getElementById('modalTitle')
+      const modalDesc = document.getElementById('modalDesc')
+      const modalUser = document.getElementById('modalUser')
+      const modalAvatar = document.getElementById('modalAvatar')
+      const modalTime = document.getElementById('modalTime')
+      const commentList = document.getElementById('commentList')
+      const commentInput = document.getElementById('commentInput')
+      const commentBtn = document.getElementById('commentBtn')
+      const modalClose = document.getElementById('modalClose')
+      const modalOverlay = document.getElementById('modalOverlay')
+
+      function getCommentsKey(postId){ return `vibe_comments_${postId}` }
+      function loadComments(postId){
+        try{
+          const raw = localStorage.getItem(getCommentsKey(postId))
+          return raw? JSON.parse(raw): []
+        }catch(e){return []}
+      }
+      function saveComments(postId, arr){ localStorage.setItem(getCommentsKey(postId), JSON.stringify(arr)) }
+
+      let activePostId = null
+      function openModal(postId){
+        activePostId = postId
+        const p = posts.find(x=>x.id===postId)
+        if(!p) return
+        modalImg.src = p.img
+        modalTitle.innerText = p.title
+        modalDesc.innerText = p.desc
+        modalUser.innerText = p.user
+        modalAvatar.src = p.avatar
+        modalTime.innerText = new Date().toLocaleString()
+        renderComments()
+        modal.classList.add('open')
+        modal.setAttribute('aria-hidden','false')
+        // trap focus briefly
+        commentInput.focus()
+      }
+
+      function closeModal(){
+        modal.classList.remove('open')
+        modal.setAttribute('aria-hidden','true')
+        activePostId = null
+      }
+
+      function renderComments(){
+        commentList.innerHTML = ''
+        if(!activePostId) return
+        const list = loadComments(activePostId)
+        if(list.length===0){
+          const li = document.createElement('li')
+          li.style.color='var(--muted)'
+          li.innerText = '还没有评论，成为第一个吧！'
+          commentList.appendChild(li)
+          return
+        }
+        list.forEach(c=>{
+          const li = document.createElement('li')
+          li.className='comment'
+          li.innerHTML = `<div class=\"meta\">${c.user} · ${c.time}</div><div>${escapeHtml(c.text)}</div>`
+          commentList.appendChild(li)
+        })
+      }
+
+      function escapeHtml(s){ return String(s).replace(/[&<>\"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[tag])) }
+
+      function postComment(){
+        if(!activePostId) return
+        const txt = commentInput.value.trim()
+        if(!txt) return
+        const list = loadComments(activePostId)
+        const now = new Date()
+        list.unshift({ user: '匿名用户', text: txt, time: now.toLocaleString() })
+        saveComments(activePostId, list)
+        commentInput.value = ''
+        renderComments()
+      }
+
+      commentBtn.addEventListener('click', postComment)
+      commentInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') postComment() })
+      modalClose.addEventListener('click', closeModal)
+      modalOverlay.addEventListener('click', closeModal)
+      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal() })
+    </script>
+  </body>
+</html>
